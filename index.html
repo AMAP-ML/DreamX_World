@@ -685,6 +685,36 @@ This capability also provides a strong foundation for agents learning from exper
       return sceneEntries;
     }
 
+    async function loadVideoManifest() {
+      try {
+        const response = await fetch("./assets/demo_videos/manifest.json", { cache: "no-store" });
+        if (!response.ok) return null;
+        return await response.json();
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function normalizeVideoList(list) {
+      if (!Array.isArray(list)) return [];
+      return sortVideoUrls(list.filter((v) => typeof v === "string" && isVideoName(v)));
+    }
+
+    function normalizeSceneList(scenes) {
+      if (!Array.isArray(scenes)) return [];
+      return scenes
+        .map((scene) => {
+          const name = (scene && typeof scene.name === "string") ? scene.name : "";
+          const videos = normalizeVideoList(scene && scene.videos);
+          return {
+            name,
+            label: sceneLabel(name),
+            videos,
+          };
+        })
+        .filter((scene) => scene.videos.length > 0);
+    }
+
     function renderShowcase(container, videoUrls) {
       if (!videoUrls.length) {
         container.innerHTML = '<div class="empty">No videos found in this section yet.</div>';
@@ -997,13 +1027,29 @@ This capability also provides a strong foundation for agents learning from exper
     }
 
     async function init() {
-      const [real, dream, third, singleEventScenes, multipleEventScenes] = await Promise.all([
-        listVideosFromDirectory("./assets/demo_videos/real_video"),
-        listVideosFromDirectory("./assets/demo_videos/dream_video"),
-        listVideosFromDirectory("./assets/demo_videos/third_video"),
-        listSceneVideos("./assets/demo_videos/event_video/single"),
-        listSceneVideos("./assets/demo_videos/event_video/multiple"),
-      ]);
+      const manifest = await loadVideoManifest();
+
+      let real = [];
+      let dream = [];
+      let third = [];
+      let singleEventScenes = [];
+      let multipleEventScenes = [];
+
+      if (manifest) {
+        real = normalizeVideoList(manifest.realVideos);
+        dream = normalizeVideoList(manifest.dreamVideos);
+        third = normalizeVideoList(manifest.thirdVideos);
+        singleEventScenes = normalizeSceneList(manifest.singleEventScenes);
+        multipleEventScenes = normalizeSceneList(manifest.multipleEventScenes);
+      } else {
+        [real, dream, third, singleEventScenes, multipleEventScenes] = await Promise.all([
+          listVideosFromDirectory("./assets/demo_videos/real_video"),
+          listVideosFromDirectory("./assets/demo_videos/dream_video"),
+          listVideosFromDirectory("./assets/demo_videos/third_video"),
+          listSceneVideos("./assets/demo_videos/event_video/single"),
+          listSceneVideos("./assets/demo_videos/event_video/multiple"),
+        ]);
+      }
 
       renderShowcase(document.getElementById("realVideos"), real);
       renderShowcase(document.getElementById("dreamVideos"), dream);

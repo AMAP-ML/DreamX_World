@@ -1,0 +1,139 @@
+{
+  "realVideos": [
+    "assets/demo_videos/real_video/01.mp4",
+    "assets/demo_videos/real_video/02.mp4",
+    "assets/demo_videos/real_video/03.mp4",
+    "assets/demo_videos/real_video/04.mp4",
+    "assets/demo_videos/real_video/05.mp4",
+    "assets/demo_videos/real_video/06.mp4",
+    "assets/demo_videos/real_video/07.mp4",
+    "assets/demo_videos/real_video/08.mp4"
+  ],
+  "dreamVideos": [
+    "assets/demo_videos/dream_video/01.mp4",
+    "assets/demo_videos/dream_video/02.mp4",
+    "assets/demo_videos/dream_video/03.mp4",
+    "assets/demo_videos/dream_video/04.mp4",
+    "assets/demo_videos/dream_video/06.mp4",
+    "assets/demo_videos/dream_video/07.mp4",
+    "assets/demo_videos/dream_video/08.mp4",
+    "assets/demo_videos/dream_video/09.mp4",
+    "assets/demo_videos/dream_video/10.mp4",
+    "assets/demo_videos/dream_video/11.mp4"
+  ],
+  "thirdVideos": [
+    "assets/demo_videos/third_video/01.mp4",
+    "assets/demo_videos/third_video/02.mp4",
+    "assets/demo_videos/third_video/03.mp4",
+    "assets/demo_videos/third_video/04.mp4",
+    "assets/demo_videos/third_video/05.mp4",
+    "assets/demo_videos/third_video/06.mp4",
+    "assets/demo_videos/third_video/07.mp4",
+    "assets/demo_videos/third_video/08.mp4",
+    "assets/demo_videos/third_video/10.mp4",
+    "assets/demo_videos/third_video/11.mp4",
+    "assets/demo_videos/third_video/12.mp4",
+    "assets/demo_videos/third_video/13.mp4"
+  ],
+  "singleEventScenes": [
+    {
+      "name": "cartoon",
+      "videos": [
+        "assets/demo_videos/event_video/single/cartoon/A blizzard hit.mp4",
+        "assets/demo_videos/event_video/single/cartoon/A dragon swoops into the scene..mp4",
+        "assets/demo_videos/event_video/single/cartoon/A thunderstorm strike.mp4",
+        "assets/demo_videos/event_video/single/cartoon/An avalanche strike.mp4",
+        "assets/demo_videos/event_video/single/cartoon/Iron Man enters from the right..mp4",
+        "assets/demo_videos/event_video/single/cartoon/Spider-Man appears from above, shooting out spider silk..mp4"
+      ]
+    },
+    {
+      "name": "fly",
+      "videos": [
+        "assets/demo_videos/event_video/single/fly/A huge dragon swoops into the scene.mp4",
+        "assets/demo_videos/event_video/single/fly/A violent blizzard engulfs the scene.mp4",
+        "assets/demo_videos/event_video/single/fly/Massive volcanic explosion sends fire and rocks high into the air..mp4",
+        "assets/demo_videos/event_video/single/fly/Optimus Prime appears, stepping into the scene..mp4",
+        "assets/demo_videos/event_video/single/fly/phoenix emerge from the mist..mp4"
+      ]
+    },
+    {
+      "name": "game",
+      "videos": [
+        "assets/demo_videos/event_video/single/game/A tsunami occurs..mp4",
+        "assets/demo_videos/event_video/single/game/A volcanic eruption happens..mp4",
+        "assets/demo_videos/event_video/single/game/Batman appears from the left.mp4",
+        "assets/demo_videos/event_video/single/game/Hulk appears from the left.mp4",
+        "assets/demo_videos/event_video/single/game/Lightning strike.mp4",
+        "assets/demo_videos/event_video/single/game/Spider-Man suddenly appears.mp4",
+        "assets/demo_videos/event_video/single/game/Thanos appears from behind.mp4"
+      ]
+    },
+    {
+      "name": "ski",
+      "videos": [
+        "assets/demo_videos/event_video/single/ski/A volcanic eruption occurs.mp4",
+        "assets/demo_videos/event_video/single/ski/Batman enters from behind.mp4",
+        "assets/demo_videos/event_video/single/ski/Blizzard occurs.mp4",
+        "assets/demo_videos/event_video/single/ski/Pikachu enters from the left.mp4",
+        "assets/demo_videos/event_video/single/ski/Spider-Man enters from the right.mp4"
+      ]
+    },
+    {
+      "name": "surfing",
+      "videos": [
+        "assets/demo_videos/event_video/single/surfing/A dragon appears.mp4",
+        "assets/demo_videos/event_video/single/surfing/A phoenix enters from the above.mp4",
+        "assets/demo_videos/event_video/single/surfing/Blizzard happens.mp4",
+        "assets/demo_videos/event_video/single/surfing/Spider-Man enters from the right.mp4"
+      ]
+    }
+  ],
+  "multipleEventScenes": [
+    {
+      "name": "castle",
+      "videos": [
+        "assets/demo_videos/event_video/multiple/castle/A UFO appears overhead and beams down a laser, kicking up a wave of flying lavender petals..mp4",
+        "assets/demo_videos/event_video/multiple/castle/Godzilla breaks through the fog and shoots a laser beam, triggering a whirlwind of lavender.mp4",
+        "assets/demo_videos/event_video/multiple/castle/Mario appears from the mist, bursting with countless gold coins and causing a flurry of flying lavender petals.mp4",
+        "assets/demo_videos/event_video/multiple/castle/Pikachu appears from above, creating a sudden thunderstorm over the lavender field.mp4",
+        "assets/demo_videos/event_video/multiple/castle/Spider-Man appears from behind, swinging on a web, sending lavender petals flying into the air.mp4"
+      ]
+    },
+    {
+      "name": "city",
+      "videos": [
+        "assets/demo_videos/event_video/multiple/city/A dragon emerges from the water beyond the pier, creating a wave that overturns a tour boat.mp4",
+        "assets/demo_videos/event_video/multiple/city/A thunderstorm strikes, accompanied by a flood.mp4",
+        "assets/demo_videos/event_video/multiple/city/Godzilla breaches the water, triggering a flood that capsizes a tour boat.mp4"
+      ]
+    },
+    {
+      "name": "field",
+      "videos": [
+        "assets/demo_videos/event_video/multiple/field/A thunderstorm occurs, igniting the building and wheat field. Mario appears from behind and runs away.mp4",
+        "assets/demo_videos/event_video/multiple/field/Iron Man flies out from the right, causing the building and wheat field behind him to explode and catch fire.mp4",
+        "assets/demo_videos/event_video/multiple/field/Pikachu emerges and releases electricity, blowing up and igniting the windmill and wheat field.mp4"
+      ]
+    },
+    {
+      "name": "mountain",
+      "videos": [
+        "assets/demo_videos/event_video/multiple/mountain/A giant dragon flies out of the clouds, and thick fog spreads across the entire screen.mp4",
+        "assets/demo_videos/event_video/multiple/mountain/Clouds consume the screen; a UFO appears overhead.mp4",
+        "assets/demo_videos/event_video/multiple/mountain/Clouds spreads, snow accumulates on the ground, and a violent thunderstorm occurs as Thor reveals himself.mp4",
+        "assets/demo_videos/event_video/multiple/mountain/Fog spreads. Lightning flashes in the mist. Pikachu emerges.mp4",
+        "assets/demo_videos/event_video/multiple/mountain/Snowstorm occurs. Spider-Man appears instantly behind, looking around side to side.mp4"
+      ]
+    },
+    {
+      "name": "road",
+      "videos": [
+        "assets/demo_videos/event_video/multiple/road/Dark clouds gather and a thunderstorm strikes. Thor emerges from the water.mp4",
+        "assets/demo_videos/event_video/multiple/road/Godzilla emerges from the water. A car drives past in the background.mp4",
+        "assets/demo_videos/event_video/multiple/road/Sudden high wave hits the coastal road. Pikachu appears from behind.mp4",
+        "assets/demo_videos/event_video/multiple/road/Underwater explosion. Mario emerges from the water, scattering massive gold coins.mp4"
+      ]
+    }
+  ]
+}
