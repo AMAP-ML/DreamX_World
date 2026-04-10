@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DreamX-World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05070b;
+      --panel: rgba(9, 24, 35, 0.5);
+      --panel-2: rgba(13, 30, 44, 0.65);
+      --text: #e6f2ff;
+      --muted: #bfd0df;
+      --accent: #4b95ff;
+      --border: rgba(220, 235, 255, 0.2);
+      --video-max-width: 840px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", "SF Pro Display", "Segoe UI", Arial, sans-serif;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background:
+        radial-gradient(circle at 15% -20%, rgba(90, 130, 190, 0.1), transparent 35%),
+        linear-gradient(180deg, rgba(8, 12, 20, 0.65), rgba(5, 8, 14, 0.75)),
+        var(--bg);
+      color: var(--text);
+      padding-top: 64px;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(10, 32, 45, 0.56);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .topbar-inner {
+      width: min(1280px, 94vw);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--accent);
+    }
+
+    .topbar-brand {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .topbar-logo {
+      width: 47px;
+      height: 47px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .container {
+      width: min(1280px, 94vw);
+      margin: 0 auto;
+      padding: 34px 0 56px;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .hero-title {
+      margin: 4px 0 14px;
+      font-size: clamp(30px, 5.25vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .hero-title .accent {
+      color: var(--accent);
+    }
+
+    .hero-title .dark {
+      color: #eaf4ff;
+    }
+
+    .subtitle {
+      margin: 0 auto 28px;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: clamp(15px, 1.8vw, 21px);
+      line-height: 1.25;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .hero-pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      color: #e0ecff;
+      text-decoration: none;
+      background: rgba(8, 22, 32, 0.42);
+      font-size: 15px;
+    }
+
+    .intro-frame {
+      width: min(var(--video-max-width), 100%);
+      margin: 0 auto;
+      border-radius: 12px;
+    }
+
+    .intro-frame iframe,
+    .intro-frame video {
+      width: 100%;
+      max-height: 74vh;
+      border-radius: 12px;
+      background: #000;
+      display: block;
+      aspect-ratio: 16 / 9;
+      border: 0;
+    }
+
+    .intro-description {
+      width: min(var(--video-max-width), 100%);
+      margin: 48px auto 0;
+      color: #d6e4f2;
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: -0.005em;
+      text-align: left;
+      font-weight: 300;
+    }
+
+    .chapter {
+      margin-top: 116px;
+    }
+
+    .chapter h2 {
+      width: min(var(--video-max-width), 100%);
+      margin: 0 auto 22px;
+      font-size: clamp(18px, 2.4vw, 31px);
+      line-height: 1.15;
+      color: #ebf5ff;
+      letter-spacing: -0.01em;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .chapter p {
+      width: min(var(--video-max-width), 100%);
+      margin: 0 auto 48px;
+      color: #d0dfef;
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 980px;
+      letter-spacing: -0.005em;
+      font-weight: 300;
+    }
+
+    .showcase-main {
+      width: min(var(--video-max-width), 100%);
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .showcase-main video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      background: #000;
+      border-radius: 12px;
+    }
+
+    .thumb-carousel {
+      width: min(var(--video-max-width), 100%);
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .thumb-nav {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(8, 24, 36, 0.72);
+      color: #e6f2ff;
+      font-size: 36px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      user-select: none;
+    }
+
+    .thumb-nav:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .thumb-viewport {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .thumb-viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .thumb-track {
+      display: flex;
+      gap: 10px;
+    }
+
+    .thumb-item {
+      flex: 0 0 132px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0e1119;
+      cursor: pointer;
+    }
+
+    .thumb-item video {
+      width: 100%;
+      display: block;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .thumb-item.active {
+      border-color: #4f70ff;
+      box-shadow: 0 0 0 2px rgba(79, 112, 255, 0.18);
+    }
+
+    .empty {
+      padding: 14px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .event-stack {
+      width: min(var(--video-max-width), 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 42px;
+    }
+
+    .event-chapter {
+      background: #060913;
+      border-radius: 18px;
+      padding: 38px 0 44px;
+    }
+
+    .event-chapter h2 {
+      color: rgba(245, 248, 255, 0.95);
+    }
+
+    .event-chapter > p {
+      color: rgba(216, 224, 240, 0.85);
+    }
+
+    .event-module {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .event-module h3 {
+      margin: 0 0 16px;
+      font-size: 20.8px;
+      font-weight: 500;
+      color: rgba(239, 244, 255, 0.95);
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+
+    .event-scene-tabs {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 10px;
+      border-radius: 999px;
+      background: rgba(11, 14, 22, 0.9);
+      margin: 0 auto 18px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: min(var(--video-max-width), 100%);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .event-scene-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .event-scene-tab {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 19px;
+      background: transparent;
+      color: rgba(240, 245, 255, 0.88);
+      font-size: 18.9px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .event-scene-tab.active {
+      background: rgba(255, 255, 255, 0.96);
+      color: #1e2633;
+    }
+
+    .event-main-wrap {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      aspect-ratio: 16 / 9;
+      width: min(var(--video-max-width), 100%);
+    }
+
+    .event-main-wrap video {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .event-main-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      background: rgba(5, 8, 14, 0.42);
+      color: rgba(244, 249, 255, 0.96);
+      font-size: clamp(24px, 3.2vw, 46px);
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      text-align: center;
+      padding: 16px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .event-main-overlay.visible {
+      opacity: 1;
+    }
+
+    .event-prompt-bar {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 999px;
+      background: rgba(11, 14, 22, 0.92);
+      width: min(720px, 100%);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .event-prompt-btn {
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(238, 245, 255, 0.92);
+      font-size: 24px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+    }
+
+    .event-prompt-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .event-prompt-text {
+      color: rgba(240, 246, 255, 0.95);
+      font-size: 21px;
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      text-overflow: clip;
+      padding-inline: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      cursor: default;
+      user-select: text;
+      text-align: left;
+    }
+
+    .event-prompt-text::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .subtitle {
+        font-size: 15px;
+        margin-bottom: 20px;
+      }
+      .intro-description {
+        font-size: 10px;
+        margin-top: 28px;
+      }
+      .chapter {
+        margin-top: 78px;
+      }
+      .chapter h2 {
+        font-size: 18px;
+        margin-bottom: 14px;
+      }
+      .chapter p {
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+      .thumb-item {
+        flex-basis: 96px;
+      }
+      .thumb-nav {
+        width: 34px;
+        height: 34px;
+        font-size: 28px;
+      }
+      .showcase-main {
+        padding: 10px;
+        border-radius: 12px;
+      }
+      .intro-frame {
+        padding: 10px;
+        border-radius: 12px;
+      }
+      .hero-pill {
+        padding: 8px 14px;
+        font-size: 14px;
+      }
+      .hero-actions {
+        margin-bottom: 24px;
+      }
+      .event-module h3 {
+        font-size: 15.4px;
+      }
+      .event-chapter {
+        padding: 26px 0 30px;
+      }
+      .event-scene-tab {
+        font-size: 12.6px;
+        padding: 7px 12px;
+      }
+      .event-prompt-text {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <img class="topbar-logo" src="./assets/logo.jpg" alt="DreamX logo">
+      <span class="topbar-brand">DreamX</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero">
+      <h1 class="hero-title"><span class="accent">DreamX</span><span class="dark">-World</span></h1>
+      <p class="subtitle">
+        DreamX Team
+      </p>
+      <div class="hero-actions">
+        <a class="hero-pill" href="#">Tech Report(coming soon)</a>
+        <a class="hero-pill" href="https://github.com/AMAP-ML/DeamX-World" target="_blank" rel="noopener noreferrer">Code</a>
+      </div>
+      <div class="intro-frame">
+        <iframe
+          id="introVideoEmbed"
+          src="https://www.youtube.com/embed/FFCkNGHFcoY?autoplay=1&mute=1&loop=1&playlist=FFCkNGHFcoY&rel=0&modestbranding=1&controls=0&iv_load_policy=3&cc_load_policy=0&disablekb=1&playsinline=1&vq=hd1080&hd=1"
+          title="DreamX-World Intro Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          loading="lazy">
+        </iframe>
+      </div>
+      <p class="intro-description">
+        DreamX-World is a general-purpose world model that creates diverse, high-fidelity worlds that can be explored, controlled, and transformed through actions and event prompts. Going beyond passive video generation, DreamX-World enables interactive world simulation with strong controllability, high visual fidelity, and flexible prompt-driven events.
+
+Built on top of a scalable data engine, DreamX-World is trained on a diverse mixture of data sources, including Unreal Engine data, gameplay footage, and real-world videos. Through accurate camera estimation, rigorous data filtering, and carefully curated data distributions, the model learns realistic world dynamics and rich interactive behaviors across a wide range of environments.
+
+Our training pipeline is designed progressively. The model first learns world dynamics and fine-grained action control, then acquires the ability to respond to open-ended events, and is further improved with Reinforcement Learning to enhance action following, interaction consistency, and visual fidelity. Finally, through forcing and distillation, DreamX-World achieves efficient inference, making interactive generation practical at scale.
+      </p>
+    </section>
+
+    <section class="chapter">
+      <h2>Navigate and Explore Realistic Worlds</h2>
+      <p>
+        DreamX-World supports interactive exploration with high fidelity, precise control, and rich dynamic scene generation.
+It generalizes across a broad range of realistic environments, including indoor scenes, urban streets, natural landscapes, and architectural spaces. The model responds accurately to fine-grained action inputs, allowing users or agents to move through generated environments in a controllable and physically plausible way.
+      </p>
+      <div id="realVideos"></div>
+    </section>
+
+    <section class="chapter">
+      <h2>Dive into Dream Worlds</h2>
+      <p>
+        In addition to realistic environments, DreamX-World unlocks a broad space of imaginative world generation.
+It supports fantastical worlds, game-like environments, science-fiction settings, and highly stylized visual domains, extending world generation from simulation to creation.
+       </p>
+      <div id="dreamVideos"></div>
+    </section>
+
+    <section class="chapter">
+      <h2>Generate in Third-Person View</h2>
+      <p>
+        DreamX-World supports both immersive first-person interaction and coherent third-person world generation.
+        Beyond first-person exploration, the model can simulate third-person experiences in which an agent moves through the world while the camera follows consistently across space and time.
+        
+        This capability enables a wide range of scenarios, from dynamic outdoor traversal to game-like character control, while maintaining stable camera-follow behavior, controllable agent motion, and coherent scene evolution. It is especially important for embodied agents, interactive simulations, and game-inspired world experiences.
+      </p>
+      <div id="thirdVideos"></div>
+    </section>
+
+    <section class="chapter event-chapter">
+      <h2>Promptable World Events</h2>
+      <p>
+        Beyond navigational control, DreamX-World supports prompt-driven world events that dynamically alter the generated environment.
+        Compared with prior approaches, DreamX-World supports more flexible and compositional event generation while maintaining consistent, interactive, and temporally coherent world evolution.
+
+This capability also provides a strong foundation for agents learning from experience, enabling them to encounter and adapt to unexpected situations in dynamic environments.
+      </p>
+      <div class="event-stack">
+        <div id="singleEventPanel"></div>
+        <div id="multipleEventPanel"></div>
+      </div>
+    </section>
+
+    <section class="chapter">
+      <h2>Next Steps</h2>
+      <p>
+        While DreamX-World already supports high-fidelity generation, controllable interaction, and promptable events, the next frontier is real-time interactive generation of long-time worlds, where users or agents can act, respond, and explore continuously without compromising temporal coherence or world consistency. Reaching this goal will require further advances in efficiency, long-horizon stability, memory, and interaction modeling, so that generated worlds remain responsive, coherent, and persistent over extended durations.
+      </p>
+      <p>
+        We also believe that progress in world models should benefit the broader research community. To help accelerate research in this area, we are committed to open-sourcing DreamX-World as soon as possible, including the model and code. We hope this will enable further advances in interactive generation, embodied intelligence, agent training, and creative world building.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const VIDEO_EXTENSIONS = [".mp4", ".webm", ".mov", ".m4v", ".ogg"];
+    const EVENT_OVERLAY_MIN_MS = 1500;
+
+    function isVideoName(name) {
+      const lower = name.toLowerCase();
+      return VIDEO_EXTENSIONS.some(ext => lower.endsWith(ext));
+    }
+
+    function fileNameOf(url) {
+      return decodeURIComponent((url.split("/").pop() || "").toLowerCase());
+    }
+
+    function fileNameLabel(url) {
+      const full = decodeURIComponent(url.split("/").pop() || "Default");
+      return full.replace(/\.[^.]+$/, "");
+    }
+
+    function sortVideoUrls(urls) {
+      return [...urls].sort((a, b) =>
+        fileNameOf(a).localeCompare(fileNameOf(b), undefined, { numeric: true, sensitivity: "base" })
+      );
+    }
+
+    function sceneLabel(name) {
+      if (!name) return "Default";
+      return name
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    async function listSubdirectories(path) {
+      try {
+        const response = await fetch(`${path}/`);
+        if (!response.ok) return [];
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const links = Array.from(doc.querySelectorAll("a"));
+        const dirs = links
+          .map(a => (a.getAttribute("href") || "").trim())
+          .filter(h => h && h.endsWith("/"))
+          .map(h => decodeURIComponent(h.split("#")[0].split("?")[0]).replace(/\/$/, ""))
+          .filter(h => h && h !== "." && h !== ".." && !h.startsWith("."));
+        return sortVideoUrls([...new Set(dirs)]);
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function listVideosFromDirectory(path) {
+      try {
+        const response = await fetch(`${path}/`);
+        if (!response.ok) return [];
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const links = Array.from(doc.querySelectorAll("a"));
+        const listed = links
+          .map(a => (a.getAttribute("href") || "").trim())
+          .filter(h => h && !h.startsWith("?"))
+          .map(h => decodeURIComponent(h.split("#")[0].split("?")[0]))
+          .filter(h => !h.endsWith("/"))
+          .filter(isVideoName)
+          .map(h => `${path}/${h.replace(/^\.?\//, "")}`);
+        const uniqueListed = [...new Set(listed)];
+        if (uniqueListed.length > 0) {
+          return sortVideoUrls(uniqueListed);
+        }
+        return [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function listSceneVideos(rootPath) {
+      const sceneDirs = await listSubdirectories(rootPath);
+      const sceneEntries = [];
+      for (const dir of sceneDirs) {
+        const scenePath = `${rootPath}/${dir}`;
+        const videos = await listVideosFromDirectory(scenePath);
+        if (videos.length) {
+          sceneEntries.push({
+            name: dir,
+            label: sceneLabel(dir),
+            videos,
+          });
+        }
+      }
+      return sceneEntries;
+    }
+
+    function renderShowcase(container, videoUrls) {
+      if (!videoUrls.length) {
+        container.innerHTML = '<div class="empty">No videos found in this section yet.</div>';
+        return;
+      }
+      const sorted = sortVideoUrls(videoUrls);
+      container.innerHTML = `
+        <div class="showcase-main">
+          <video class="main-video" src="${sorted[0]}" autoplay muted playsinline controls preload="metadata"></video>
+        </div>
+        <div class="thumb-carousel">
+          <button class="thumb-nav prev" type="button" aria-label="Previous videos">‹</button>
+          <div class="thumb-viewport">
+            <div class="thumb-track">
+              ${sorted.map((url, idx) => `
+                <button class="thumb-item ${idx === 0 ? "active" : ""}" data-src="${url}" type="button">
+                  <video src="${url}" muted loop playsinline preload="metadata"></video>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+          <button class="thumb-nav next" type="button" aria-label="Next videos">›</button>
+        </div>
+      `;
+
+      const mainVideo = container.querySelector(".main-video");
+      const thumbs = Array.from(container.querySelectorAll(".thumb-item"));
+      const viewport = container.querySelector(".thumb-viewport");
+      const prevBtn = container.querySelector(".thumb-nav.prev");
+      const nextBtn = container.querySelector(".thumb-nav.next");
+      let currentIndex = 0;
+
+      function getStep() {
+        if (!viewport) return 300;
+        return Math.max(120, viewport.clientWidth);
+      }
+
+      function updateNavState() {
+        if (!viewport || !prevBtn || !nextBtn) return;
+        const maxScrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        prevBtn.disabled = viewport.scrollLeft <= 2;
+        nextBtn.disabled = viewport.scrollLeft >= maxScrollLeft - 2;
+      }
+
+      function activate(index) {
+        currentIndex = (index + thumbs.length) % thumbs.length;
+        const activeThumb = thumbs[currentIndex];
+        const src = activeThumb.getAttribute("data-src");
+        if (!src) return;
+        mainVideo.src = src;
+        mainVideo.play().catch(() => {});
+        thumbs.forEach(t => t.classList.remove("active"));
+        activeThumb.classList.add("active");
+        if (viewport) {
+          const targetLeft = activeThumb.offsetLeft - (viewport.clientWidth - activeThumb.clientWidth) / 2;
+          const maxLeft = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+          viewport.scrollTo({
+            left: Math.max(0, Math.min(targetLeft, maxLeft)),
+            behavior: "smooth",
+          });
+        }
+        updateNavState();
+      }
+
+      thumbs.forEach((thumb, index) => {
+        thumb.addEventListener("click", () => {
+          activate(index);
+        });
+      });
+
+      prevBtn.addEventListener("click", () => {
+        viewport.scrollBy({ left: -getStep(), behavior: "smooth" });
+      });
+      nextBtn.addEventListener("click", () => {
+        viewport.scrollBy({ left: getStep(), behavior: "smooth" });
+      });
+      viewport.addEventListener("scroll", updateNavState);
+      window.addEventListener("resize", updateNavState);
+      updateNavState();
+
+      if (thumbs.length > 1) {
+        mainVideo.addEventListener("ended", () => {
+          activate(currentIndex + 1);
+        });
+      }
+    }
+
+    function renderEventPanel(container, title, scenes) {
+      if (!scenes.length) {
+        container.innerHTML = `<div class="event-module"><h3>${title}</h3><div class="empty">No videos found in this section yet.</div></div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="event-module">
+          <h3>${title}</h3>
+          <div class="event-scene-tabs">
+            ${scenes.map((scene, idx) => `
+              <button class="event-scene-tab ${idx === 0 ? "active" : ""}" type="button" data-scene="${idx}">
+                ${scene.label}
+              </button>
+            `).join("")}
+          </div>
+          <div class="event-main-wrap">
+            <video class="event-main-video" src="${scenes[0].videos[0]}" muted playsinline controls preload="metadata"></video>
+            <div class="event-main-overlay visible">What event should happen next?</div>
+          </div>
+          <div class="event-prompt-bar">
+            <button class="event-prompt-btn prev" type="button" aria-label="Previous prompt">‹</button>
+            <div class="event-prompt-text">${fileNameLabel(scenes[0].videos[0])}</div>
+            <button class="event-prompt-btn next" type="button" aria-label="Next prompt">›</button>
+          </div>
+        </div>
+      `;
+
+      const sceneTabs = Array.from(container.querySelectorAll(".event-scene-tab"));
+      const mainVideo = container.querySelector(".event-main-video");
+      const mainOverlay = container.querySelector(".event-main-overlay");
+      const promptText = container.querySelector(".event-prompt-text");
+      const prevBtn = container.querySelector(".event-prompt-btn.prev");
+      const nextBtn = container.querySelector(".event-prompt-btn.next");
+      let sceneIndex = 0;
+      let promptIndex = 0;
+      let transitionToken = 0;
+      let promptScrollRaf = null;
+      let promptScrollTimeout = null;
+      let promptScrollDirection = 1;
+      let promptPaused = false;
+
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      function setOverlayVisible(visible) {
+        if (!mainOverlay) return;
+        mainOverlay.classList.toggle("visible", visible);
+      }
+
+      function stopPromptScroll() {
+        if (promptScrollRaf !== null) {
+          cancelAnimationFrame(promptScrollRaf);
+          promptScrollRaf = null;
+        }
+        if (promptScrollTimeout !== null) {
+          clearTimeout(promptScrollTimeout);
+          promptScrollTimeout = null;
+        }
+      }
+
+      function startPromptScroll() {
+        stopPromptScroll();
+        promptText.scrollLeft = 0;
+        const maxScroll = Math.max(0, promptText.scrollWidth - promptText.clientWidth);
+        if (maxScroll <= 0) return;
+
+        promptScrollDirection = 1;
+        let lastTs = null;
+
+        const tick = (ts) => {
+          if (promptPaused) {
+            lastTs = ts;
+            promptScrollRaf = requestAnimationFrame(tick);
+            return;
+          }
+          if (lastTs === null) lastTs = ts;
+          const dt = ts - lastTs;
+          lastTs = ts;
+
+          const speed = 0.045; // px per ms
+          const next = promptText.scrollLeft + promptScrollDirection * speed * dt;
+          if (next >= maxScroll) {
+            promptText.scrollLeft = maxScroll;
+            promptScrollDirection = -1;
+            promptScrollTimeout = setTimeout(() => {
+              promptScrollRaf = requestAnimationFrame(tick);
+            }, 850);
+            return;
+          }
+          if (next <= 0) {
+            promptText.scrollLeft = 0;
+            promptScrollDirection = 1;
+            promptScrollTimeout = setTimeout(() => {
+              promptScrollRaf = requestAnimationFrame(tick);
+            }, 850);
+            return;
+          }
+          promptText.scrollLeft = next;
+          promptScrollRaf = requestAnimationFrame(tick);
+        };
+
+        promptScrollTimeout = setTimeout(() => {
+          promptScrollRaf = requestAnimationFrame(tick);
+        }, 350);
+      }
+
+      function updatePromptControls() {
+        const currentScene = scenes[sceneIndex];
+        const total = currentScene.videos.length;
+        const disabled = total <= 1;
+        prevBtn.disabled = disabled;
+        nextBtn.disabled = disabled;
+        promptText.title = promptText.textContent;
+        startPromptScroll();
+      }
+
+      function loadFirstFrame(src, token) {
+        return new Promise((resolve) => {
+          const done = () => {
+            if (token !== transitionToken) {
+              resolve(false);
+              return;
+            }
+            try {
+              mainVideo.pause();
+              mainVideo.currentTime = 0;
+            } catch (_) {}
+            resolve(true);
+          };
+
+          const onLoadedData = () => {
+            cleanup();
+            done();
+          };
+          const onError = () => {
+            cleanup();
+            resolve(false);
+          };
+          const cleanup = () => {
+            mainVideo.removeEventListener("loadeddata", onLoadedData);
+            mainVideo.removeEventListener("error", onError);
+          };
+
+          mainVideo.addEventListener("loadeddata", onLoadedData, { once: true });
+          mainVideo.addEventListener("error", onError, { once: true });
+          mainVideo.src = src;
+          mainVideo.load();
+        });
+      }
+
+      async function typePrompt(text, token) {
+        promptText.textContent = "";
+        const chars = Array.from(text);
+        for (let i = 0; i < chars.length; i++) {
+          if (token !== transitionToken) return false;
+          promptText.textContent += chars[i];
+          await wait(34);
+        }
+        return true;
+      }
+
+      async function runCurrentPromptAndPlay() {
+        const token = ++transitionToken;
+        const currentScene = scenes[sceneIndex];
+        const src = currentScene.videos[promptIndex];
+        const label = fileNameLabel(src);
+        const overlayStartAt = performance.now();
+
+        setOverlayVisible(true);
+        updatePromptControls();
+        const loaded = await loadFirstFrame(src, token);
+        if (!loaded || token !== transitionToken) return;
+
+        const typed = await typePrompt(label, token);
+        if (!typed || token !== transitionToken) return;
+
+        const elapsed = performance.now() - overlayStartAt;
+        if (elapsed < EVENT_OVERLAY_MIN_MS) {
+          await wait(EVENT_OVERLAY_MIN_MS - elapsed);
+          if (token !== transitionToken) return;
+        }
+
+        try {
+          mainVideo.currentTime = 0;
+        } catch (_) {}
+        mainVideo.play()
+          .then(() => {
+            if (token === transitionToken) setOverlayVisible(false);
+          })
+          .catch(() => {
+            // Keep overlay visible if autoplay is blocked.
+            if (token === transitionToken) setOverlayVisible(true);
+          });
+      }
+
+      function setScene(index) {
+        sceneIndex = (index + scenes.length) % scenes.length;
+        promptIndex = 0;
+        sceneTabs.forEach((tab, idx) => tab.classList.toggle("active", idx === sceneIndex));
+        runCurrentPromptAndPlay();
+      }
+
+      function shiftPrompt(step) {
+        const currentScene = scenes[sceneIndex];
+        const total = currentScene.videos.length;
+        if (total <= 1) return;
+        promptIndex = (promptIndex + step + total) % total;
+        runCurrentPromptAndPlay();
+      }
+
+      sceneTabs.forEach((tab, idx) => {
+        tab.addEventListener("click", () => setScene(idx));
+      });
+      prevBtn.addEventListener("click", () => shiftPrompt(-1));
+      nextBtn.addEventListener("click", () => shiftPrompt(1));
+      mainVideo.addEventListener("ended", () => shiftPrompt(1));
+      promptText.addEventListener("mouseenter", () => { promptPaused = true; });
+      promptText.addEventListener("mouseleave", () => { promptPaused = false; });
+      promptText.addEventListener("touchstart", () => { promptPaused = true; }, { passive: true });
+      promptText.addEventListener("touchend", () => { promptPaused = false; }, { passive: true });
+
+      runCurrentPromptAndPlay();
+    }
+
+    async function init() {
+      const [real, dream, third, singleEventScenes, multipleEventScenes] = await Promise.all([
+        listVideosFromDirectory("./assets/demo_videos/real_video"),
+        listVideosFromDirectory("./assets/demo_videos/dream_video"),
+        listVideosFromDirectory("./assets/demo_videos/third_video"),
+        listSceneVideos("./assets/demo_videos/event_video/single"),
+        listSceneVideos("./assets/demo_videos/event_video/multiple"),
+      ]);
+
+      renderShowcase(document.getElementById("realVideos"), real);
+      renderShowcase(document.getElementById("dreamVideos"), dream);
+      renderShowcase(document.getElementById("thirdVideos"), third);
+      renderEventPanel(document.getElementById("singleEventPanel"), "Single Event", singleEventScenes);
+      renderEventPanel(document.getElementById("multipleEventPanel"), "Compositional Events", multipleEventScenes);
+    }
+
+    init();
+  </script>
+</body>
+</html>
