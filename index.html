@@ -157,6 +157,8 @@
 
     .chapter {
       margin-top: 116px;
+      content-visibility: auto;
+      contain-intrinsic-size: 900px;
     }
 
     .chapter h2 {
@@ -254,7 +256,7 @@
       cursor: pointer;
     }
 
-    .thumb-item video {
+    .thumb-item img {
       width: 100%;
       display: block;
       aspect-ratio: 16 / 9;
@@ -273,6 +275,17 @@
       border-radius: 10px;
       color: var(--muted);
       font-size: 14px;
+    }
+
+    .loading {
+      opacity: 0.9;
+      animation: pulseLoading 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulseLoading {
+      0% { opacity: 0.55; }
+      50% { opacity: 1; }
+      100% { opacity: 0.55; }
     }
 
     .event-stack {
@@ -523,7 +536,7 @@
       <div class="intro-frame">
         <iframe
           id="introVideoEmbed"
-          src="https://www.youtube.com/embed/lO_VXzpQehc?autoplay=1&mute=1&loop=1&playlist=lO_VXzpQehc&rel=0&modestbranding=1&controls=0&iv_load_policy=3&cc_load_policy=0&disablekb=1&playsinline=1&vq=hd1080&hd=1"
+          src="https://www.youtube.com/embed/lO_VXzpQehc?autoplay=1&mute=1&loop=1&playlist=lO_VXzpQehc&rel=0&modestbranding=1&controls=0&iv_load_policy=3&cc_load_policy=0&disablekb=1&playsinline=1&vq=hd720&hd=1"
           title="DreamX-World Intro Video"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen
@@ -609,6 +622,12 @@ This capability also provides a strong foundation for agents learning from exper
     function fileNameLabel(url) {
       const full = decodeURIComponent(url.split("/").pop() || "Default");
       return full.replace(/\.[^.]+$/, "");
+    }
+
+    function thumbPathFor(videoUrl) {
+      return videoUrl
+        .replace("assets/demo_videos/", "assets/demo_thumbs/")
+        .replace(/\.[^.]+$/, ".jpg");
     }
 
     function sortVideoUrls(urls) {
@@ -715,7 +734,52 @@ This capability also provides a strong foundation for agents learning from exper
         .filter((scene) => scene.videos.length > 0);
     }
 
-    function renderShowcase(container, videoUrls) {
+    function isWeakNetwork() {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (!conn) return false;
+      if (conn.saveData) return true;
+      const type = (conn.effectiveType || "").toLowerCase();
+      return type === "slow-2g" || type === "2g" || type === "3g";
+    }
+
+    function watchVisibility(target, { onVisible, onHidden, threshold = 0.25 }) {
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onVisible?.();
+          else onHidden?.();
+        }
+      }, { root: null, rootMargin: "0px", threshold });
+      observer.observe(target);
+      return observer;
+    }
+
+    function safeAutoplay(videoEl) {
+      if (!videoEl) return;
+      videoEl.play().catch(() => {
+        const retry = () => {
+          videoEl.play().catch(() => {});
+        };
+        videoEl.addEventListener("canplay", retry, { once: true });
+      });
+    }
+
+    function lazyMount(container, mountFn) {
+      if (!container) return;
+      container.innerHTML = '<div class="empty loading">Loading videos...</div>';
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          observer.unobserve(container);
+          mountFn();
+        }
+      }, { root: null, rootMargin: "220px 0px", threshold: 0.01 });
+
+      observer.observe(container);
+    }
+
+    function renderShowcase(container, videoUrls, options = {}) {
+      const { autoplayOnVisible = true } = options;
       if (!videoUrls.length) {
         container.innerHTML = '<div class="empty">No videos found in this section yet.</div>';
         return;
@@ -723,7 +787,7 @@ This capability also provides a strong foundation for agents learning from exper
       const sorted = sortVideoUrls(videoUrls);
       container.innerHTML = `
         <div class="showcase-main">
-          <video class="main-video" src="${sorted[0]}" autoplay muted playsinline controls preload="metadata"></video>
+          <video class="main-video" autoplay muted playsinline controls preload="none" poster="${thumbPathFor(sorted[0])}"></video>
         </div>
         <div class="thumb-carousel">
           <button class="thumb-nav prev" type="button" aria-label="Previous videos">‹</button>
@@ -731,7 +795,7 @@ This capability also provides a strong foundation for agents learning from exper
             <div class="thumb-track">
               ${sorted.map((url, idx) => `
                 <button class="thumb-item ${idx === 0 ? "active" : ""}" data-src="${url}" type="button">
-                  <video src="${url}" muted loop playsinline preload="metadata"></video>
+                  <img src="${thumbPathFor(url)}" alt="${fileNameLabel(url)} thumbnail" loading="lazy" decoding="async">
                 </button>
               `).join("")}
             </div>
@@ -741,11 +805,30 @@ This capability also provides a strong foundation for agents learning from exper
       `;
 
       const mainVideo = container.querySelector(".main-video");
+      const mainWrap = container.querySelector(".showcase-main");
       const thumbs = Array.from(container.querySelectorAll(".thumb-item"));
       const viewport = container.querySelector(".thumb-viewport");
       const prevBtn = container.querySelector(".thumb-nav.prev");
       const nextBtn = container.querySelector(".thumb-nav.next");
       let currentIndex = 0;
+      let isVisible = false;
+      let desiredSrc = sorted[0];
+      let userActivated = false;
+
+      function ensureMainSource(src) {
+        if (mainVideo.dataset.srcLoaded === src) return;
+        mainVideo.poster = thumbPathFor(src);
+        mainVideo.src = src;
+        mainVideo.dataset.srcLoaded = src;
+        mainVideo.load();
+      }
+
+      function playIfVisible() {
+        if (!isVisible) return;
+        if (!autoplayOnVisible && !userActivated) return;
+        ensureMainSource(desiredSrc);
+        safeAutoplay(mainVideo);
+      }
 
       function getStep() {
         if (!viewport) return 300;
@@ -764,8 +847,18 @@ This capability also provides a strong foundation for agents learning from exper
         const activeThumb = thumbs[currentIndex];
         const src = activeThumb.getAttribute("data-src");
         if (!src) return;
-        mainVideo.src = src;
-        mainVideo.play().catch(() => {});
+        desiredSrc = src;
+        if (index !== currentIndex) {
+          userActivated = true;
+        }
+        if (isVisible) {
+          ensureMainSource(src);
+          if (autoplayOnVisible || userActivated) {
+            safeAutoplay(mainVideo);
+          }
+        } else {
+          mainVideo.pause();
+        }
         thumbs.forEach(t => t.classList.remove("active"));
         activeThumb.classList.add("active");
         if (viewport) {
@@ -781,6 +874,7 @@ This capability also provides a strong foundation for agents learning from exper
 
       thumbs.forEach((thumb, index) => {
         thumb.addEventListener("click", () => {
+          userActivated = true;
           activate(index);
         });
       });
@@ -797,12 +891,32 @@ This capability also provides a strong foundation for agents learning from exper
 
       if (thumbs.length > 1) {
         mainVideo.addEventListener("ended", () => {
-          activate(currentIndex + 1);
+          if (autoplayOnVisible || userActivated) activate(currentIndex + 1);
         });
       }
+
+      mainVideo.addEventListener("play", () => {
+        userActivated = true;
+      });
+
+      watchVisibility(mainWrap, {
+        threshold: 0.35,
+        onVisible: () => {
+          isVisible = true;
+          playIfVisible();
+        },
+        onHidden: () => {
+          isVisible = false;
+          mainVideo.pause();
+        },
+      });
+
+      // Initialize active visual state without forcing immediate network load.
+      activate(0);
     }
 
-    function renderEventPanel(container, title, scenes) {
+    function renderEventPanel(container, title, scenes, options = {}) {
+      const { autoplayOnVisible = true } = options;
       if (!scenes.length) {
         container.innerHTML = `<div class="event-module"><h3>${title}</h3><div class="empty">No videos found in this section yet.</div></div>`;
         return;
@@ -819,7 +933,7 @@ This capability also provides a strong foundation for agents learning from exper
             `).join("")}
           </div>
           <div class="event-main-wrap">
-            <video class="event-main-video" src="${scenes[0].videos[0]}" muted playsinline controls preload="metadata"></video>
+            <video class="event-main-video" src="${scenes[0].videos[0]}" muted playsinline controls preload="none" poster="${thumbPathFor(scenes[0].videos[0])}"></video>
             <div class="event-main-overlay visible">What event should happen next?</div>
           </div>
           <div class="event-prompt-bar">
@@ -832,12 +946,16 @@ This capability also provides a strong foundation for agents learning from exper
 
       const sceneTabs = Array.from(container.querySelectorAll(".event-scene-tab"));
       const mainVideo = container.querySelector(".event-main-video");
+      const mainWrap = container.querySelector(".event-main-wrap");
       const mainOverlay = container.querySelector(".event-main-overlay");
       const promptText = container.querySelector(".event-prompt-text");
       const prevBtn = container.querySelector(".event-prompt-btn.prev");
       const nextBtn = container.querySelector(".event-prompt-btn.next");
       let sceneIndex = 0;
       let promptIndex = 0;
+      let panelVisible = false;
+      let pendingRunWhenVisible = false;
+      let userActivated = false;
       let transitionToken = 0;
       let promptScrollRaf = null;
       let promptScrollTimeout = null;
@@ -947,6 +1065,7 @@ This capability also provides a strong foundation for agents learning from exper
 
           mainVideo.addEventListener("loadeddata", onLoadedData, { once: true });
           mainVideo.addEventListener("error", onError, { once: true });
+          mainVideo.poster = thumbPathFor(src);
           mainVideo.src = src;
           mainVideo.load();
         });
@@ -964,6 +1083,12 @@ This capability also provides a strong foundation for agents learning from exper
       }
 
       async function runCurrentPromptAndPlay() {
+        if (!panelVisible) {
+          pendingRunWhenVisible = true;
+          return;
+        }
+        pendingRunWhenVisible = false;
+
         const token = ++transitionToken;
         const currentScene = scenes[sceneIndex];
         const src = currentScene.videos[promptIndex];
@@ -987,13 +1112,28 @@ This capability also provides a strong foundation for agents learning from exper
         try {
           mainVideo.currentTime = 0;
         } catch (_) {}
+        const shouldAutoplay = autoplayOnVisible || userActivated;
+        if (!shouldAutoplay) {
+          setOverlayVisible(false);
+          return;
+        }
         mainVideo.play()
           .then(() => {
             if (token === transitionToken) setOverlayVisible(false);
           })
           .catch(() => {
-            // Keep overlay visible if autoplay is blocked.
-            if (token === transitionToken) setOverlayVisible(true);
+            // Retry when media becomes playable; keep overlay until playback starts.
+            if (token === transitionToken) {
+              setOverlayVisible(true);
+              const retry = () => {
+                mainVideo.play()
+                  .then(() => {
+                    if (token === transitionToken) setOverlayVisible(false);
+                  })
+                  .catch(() => {});
+              };
+              mainVideo.addEventListener("canplay", retry, { once: true });
+            }
           });
       }
 
@@ -1013,21 +1153,52 @@ This capability also provides a strong foundation for agents learning from exper
       }
 
       sceneTabs.forEach((tab, idx) => {
-        tab.addEventListener("click", () => setScene(idx));
+        tab.addEventListener("click", () => {
+          userActivated = true;
+          setScene(idx);
+        });
       });
-      prevBtn.addEventListener("click", () => shiftPrompt(-1));
-      nextBtn.addEventListener("click", () => shiftPrompt(1));
+      prevBtn.addEventListener("click", () => {
+        userActivated = true;
+        shiftPrompt(-1);
+      });
+      nextBtn.addEventListener("click", () => {
+        userActivated = true;
+        shiftPrompt(1);
+      });
       mainVideo.addEventListener("ended", () => shiftPrompt(1));
+      mainVideo.addEventListener("play", () => {
+        userActivated = true;
+        setOverlayVisible(false);
+      });
       promptText.addEventListener("mouseenter", () => { promptPaused = true; });
       promptText.addEventListener("mouseleave", () => { promptPaused = false; });
       promptText.addEventListener("touchstart", () => { promptPaused = true; }, { passive: true });
       promptText.addEventListener("touchend", () => { promptPaused = false; }, { passive: true });
 
+      watchVisibility(mainWrap, {
+        threshold: 0.35,
+        onVisible: () => {
+          panelVisible = true;
+          if (pendingRunWhenVisible || !mainVideo.src) {
+            runCurrentPromptAndPlay();
+          } else if (autoplayOnVisible || userActivated) {
+            safeAutoplay(mainVideo);
+          }
+        },
+        onHidden: () => {
+          panelVisible = false;
+          mainVideo.pause();
+        },
+      });
+
+      // Start once visible.
       runCurrentPromptAndPlay();
     }
 
     async function init() {
       const manifest = await loadVideoManifest();
+      const weakNetwork = isWeakNetwork();
 
       let real = [];
       let dream = [];
@@ -1051,11 +1222,20 @@ This capability also provides a strong foundation for agents learning from exper
         ]);
       }
 
-      renderShowcase(document.getElementById("realVideos"), real);
-      renderShowcase(document.getElementById("dreamVideos"), dream);
-      renderShowcase(document.getElementById("thirdVideos"), third);
-      renderEventPanel(document.getElementById("singleEventPanel"), "Single Event", singleEventScenes);
-      renderEventPanel(document.getElementById("multipleEventPanel"), "Compositional Events", multipleEventScenes);
+      const realEl = document.getElementById("realVideos");
+      const dreamEl = document.getElementById("dreamVideos");
+      const thirdEl = document.getElementById("thirdVideos");
+      const singleEl = document.getElementById("singleEventPanel");
+      const multipleEl = document.getElementById("multipleEventPanel");
+
+      // Render first visible chapter immediately for fast first paint.
+      renderShowcase(realEl, real, { autoplayOnVisible: true });
+
+      // Defer below-the-fold video modules until near viewport.
+      lazyMount(dreamEl, () => renderShowcase(dreamEl, dream, { autoplayOnVisible: !weakNetwork }));
+      lazyMount(thirdEl, () => renderShowcase(thirdEl, third, { autoplayOnVisible: !weakNetwork }));
+      lazyMount(singleEl, () => renderEventPanel(singleEl, "Single Event", singleEventScenes, { autoplayOnVisible: !weakNetwork }));
+      lazyMount(multipleEl, () => renderEventPanel(multipleEl, "Compositional Events", multipleEventScenes, { autoplayOnVisible: !weakNetwork }));
     }
 
     init();
