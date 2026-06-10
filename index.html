@@ -258,7 +258,8 @@
       cursor: pointer;
     }
 
-    .thumb-item img {
+    .thumb-item img,
+    .thumb-item video {
       width: 100%;
       display: block;
       aspect-ratio: 16 / 9;
@@ -277,6 +278,20 @@
       border-radius: 10px;
       color: var(--muted);
       font-size: 14px;
+    }
+
+    .capability-chapter {
+      background: linear-gradient(180deg, rgba(10, 21, 34, 0.78), rgba(6, 10, 18, 0.9));
+      border-radius: 18px;
+      padding: 38px 0 44px;
+    }
+
+    .capability-chapter h2 {
+      color: rgba(245, 248, 255, 0.96);
+    }
+
+    .capability-chapter > p {
+      color: rgba(216, 226, 240, 0.88);
     }
 
     .loading {
@@ -508,6 +523,9 @@
       .event-chapter {
         padding: 26px 0 30px;
       }
+      .capability-chapter {
+        padding: 26px 0 30px;
+      }
       .event-scene-tab {
         font-size: 12.6px;
         padding: 7px 12px;
@@ -552,6 +570,22 @@ Built on top of a scalable data engine, DreamX-World is trained on a diverse mix
 
 Our training pipeline is designed progressively. The model first learns world dynamics and fine-grained action control, then acquires the ability to respond to open-ended events, and is further improved with Reinforcement Learning to enhance action following, interaction consistency, and visual fidelity. Finally, through forcing and distillation, DreamX-World achieves efficient inference, making interactive generation practical at scale.
       </p>
+    </section>
+
+    <section class="chapter capability-chapter">
+      <h2>Long-Horizon Video Generation</h2>
+      <p>
+        DreamX-World extends short interactive clips into long autoregressive rollouts. By adapting the model on long generated contexts and applying distillation with rollout correction, it can generate worlds over hundreds of frames while reducing the style and color drift that often accumulates during long video generation.
+      </p>
+      <div id="longVideos"></div>
+    </section>
+
+    <section class="chapter capability-chapter">
+      <h2>World Memory</h2>
+      <p>
+        DreamX-World uses geometry-guided memory retrieval to bring non-local visual evidence back into the generation process. When the camera revisits a previously observed region, retrieved memory frames help preserve scene layout, object identity, and local appearance, making long-horizon exploration feel more persistent and spatially consistent.
+      </p>
+      <div id="memoryVideos"></div>
     </section>
 
     <section class="chapter">
@@ -757,11 +791,25 @@ This capability also provides a strong foundation for agents learning from exper
 
     function safeAutoplay(videoEl) {
       if (!videoEl) return;
+      videoEl.muted = true;
+      videoEl.defaultMuted = true;
+      videoEl.autoplay = true;
+      videoEl.playsInline = true;
+      videoEl.setAttribute("muted", "");
+      videoEl.setAttribute("autoplay", "");
+      videoEl.setAttribute("playsinline", "");
+
+      const tryPlay = () => {
+        videoEl.play().catch(() => {});
+      };
+
       videoEl.play().catch(() => {
         const retry = () => {
-          videoEl.play().catch(() => {});
+          tryPlay();
         };
+        videoEl.addEventListener("loadedmetadata", retry, { once: true });
         videoEl.addEventListener("canplay", retry, { once: true });
+        videoEl.addEventListener("canplaythrough", retry, { once: true });
       });
     }
 
@@ -781,7 +829,7 @@ This capability also provides a strong foundation for agents learning from exper
     }
 
     function renderShowcase(container, videoUrls, options = {}) {
-      const { autoplayOnVisible = true } = options;
+      const { autoplayOnVisible = true, videoThumbs = false } = options;
       if (!videoUrls.length) {
         container.innerHTML = '<div class="empty">No videos found in this section yet.</div>';
         return;
@@ -797,7 +845,10 @@ This capability also provides a strong foundation for agents learning from exper
             <div class="thumb-track">
               ${sorted.map((url, idx) => `
                 <button class="thumb-item ${idx === 0 ? "active" : ""}" data-src="${url}" type="button">
-                  <img src="${thumbPathFor(url)}" alt="${fileNameLabel(url)} thumbnail" loading="lazy" decoding="async">
+                  ${videoThumbs
+                    ? `<video src="${url}" muted playsinline preload="metadata" aria-label="${fileNameLabel(url)} preview"></video>`
+                    : `<img src="${thumbPathFor(url)}" alt="${fileNameLabel(url)} thumbnail" loading="lazy" decoding="async">`
+                  }
                 </button>
               `).join("")}
             </div>
@@ -819,6 +870,13 @@ This capability also provides a strong foundation for agents learning from exper
 
       function ensureMainSource(src) {
         if (mainVideo.dataset.srcLoaded === src) return;
+        mainVideo.muted = true;
+        mainVideo.defaultMuted = true;
+        mainVideo.autoplay = true;
+        mainVideo.playsInline = true;
+        mainVideo.setAttribute("muted", "");
+        mainVideo.setAttribute("autoplay", "");
+        mainVideo.setAttribute("playsinline", "");
         mainVideo.poster = thumbPathFor(src);
         mainVideo.src = src;
         mainVideo.dataset.srcLoaded = src;
@@ -915,6 +973,10 @@ This capability also provides a strong foundation for agents learning from exper
 
       // Initialize active visual state without forcing immediate network load.
       activate(0);
+      if (autoplayOnVisible) {
+        ensureMainSource(desiredSrc);
+        safeAutoplay(mainVideo);
+      }
     }
 
     function renderEventPanel(container, title, scenes, options = {}) {
@@ -1200,11 +1262,11 @@ This capability also provides a strong foundation for agents learning from exper
 
     async function init() {
       const manifest = await loadVideoManifest();
-      const weakNetwork = isWeakNetwork();
-
       let real = [];
       let dream = [];
       let third = [];
+      let long = [];
+      let memory = [];
       let singleEventScenes = [];
       let multipleEventScenes = [];
 
@@ -1212,13 +1274,17 @@ This capability also provides a strong foundation for agents learning from exper
         real = normalizeVideoList(manifest.realVideos);
         dream = normalizeVideoList(manifest.dreamVideos);
         third = normalizeVideoList(manifest.thirdVideos);
+        long = normalizeVideoList(manifest.longVideos);
+        memory = normalizeVideoList(manifest.memoryVideos);
         singleEventScenes = normalizeSceneList(manifest.singleEventScenes);
         multipleEventScenes = normalizeSceneList(manifest.multipleEventScenes);
       } else {
-        [real, dream, third, singleEventScenes, multipleEventScenes] = await Promise.all([
+        [real, dream, third, long, memory, singleEventScenes, multipleEventScenes] = await Promise.all([
           listVideosFromDirectory("./assets/demo_videos/real_video"),
           listVideosFromDirectory("./assets/demo_videos/dream_video"),
           listVideosFromDirectory("./assets/demo_videos/third_video"),
+          listVideosFromDirectory("./assets/demo_videos/long_video"),
+          listVideosFromDirectory("./assets/demo_videos/memory_video"),
           listSceneVideos("./assets/demo_videos/event_video/single"),
           listSceneVideos("./assets/demo_videos/event_video/multiple"),
         ]);
@@ -1227,6 +1293,8 @@ This capability also provides a strong foundation for agents learning from exper
       const realEl = document.getElementById("realVideos");
       const dreamEl = document.getElementById("dreamVideos");
       const thirdEl = document.getElementById("thirdVideos");
+      const longEl = document.getElementById("longVideos");
+      const memoryEl = document.getElementById("memoryVideos");
       const singleEl = document.getElementById("singleEventPanel");
       const multipleEl = document.getElementById("multipleEventPanel");
 
@@ -1234,10 +1302,12 @@ This capability also provides a strong foundation for agents learning from exper
       renderShowcase(realEl, real, { autoplayOnVisible: true });
 
       // Defer below-the-fold video modules until near viewport.
-      lazyMount(dreamEl, () => renderShowcase(dreamEl, dream, { autoplayOnVisible: !weakNetwork }));
-      lazyMount(thirdEl, () => renderShowcase(thirdEl, third, { autoplayOnVisible: !weakNetwork }));
-      lazyMount(singleEl, () => renderEventPanel(singleEl, "Single Event", singleEventScenes, { autoplayOnVisible: !weakNetwork }));
-      lazyMount(multipleEl, () => renderEventPanel(multipleEl, "Compositional Events", multipleEventScenes, { autoplayOnVisible: !weakNetwork }));
+      lazyMount(dreamEl, () => renderShowcase(dreamEl, dream, { autoplayOnVisible: true }));
+      lazyMount(thirdEl, () => renderShowcase(thirdEl, third, { autoplayOnVisible: true }));
+      lazyMount(singleEl, () => renderEventPanel(singleEl, "Single Event", singleEventScenes, { autoplayOnVisible: true }));
+      lazyMount(multipleEl, () => renderEventPanel(multipleEl, "Compositional Events", multipleEventScenes, { autoplayOnVisible: true }));
+      lazyMount(longEl, () => renderShowcase(longEl, long, { autoplayOnVisible: true, videoThumbs: true }));
+      lazyMount(memoryEl, () => renderShowcase(memoryEl, memory, { autoplayOnVisible: true, videoThumbs: true }));
     }
 
     init();

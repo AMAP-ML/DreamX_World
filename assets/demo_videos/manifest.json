@@ -35,6 +35,20 @@
     "assets/demo_videos/third_video/12.mp4",
     "assets/demo_videos/third_video/13.mp4"
   ],
+  "longVideos": [
+    "assets/demo_videos/long_video/long_01.mp4",
+    "assets/demo_videos/long_video/long_02.mp4",
+    "assets/demo_videos/long_video/long_03.mp4",
+    "assets/demo_videos/long_video/long_04.mp4",
+    "assets/demo_videos/long_video/long_05.mp4"
+  ],
+  "memoryVideos": [
+    "assets/demo_videos/memory_video/memory_01.mp4",
+    "assets/demo_videos/memory_video/memory_02.mp4",
+    "assets/demo_videos/memory_video/memory_03.mp4",
+    "assets/demo_videos/memory_video/memory_04.mp4",
+    "assets/demo_videos/memory_video/memory_05.mp4"
+  ],
   "singleEventScenes": [
     {
       "name": "cartoon",

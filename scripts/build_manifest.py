@@ -52,6 +52,8 @@ def build_manifest(website_root: Path) -> Dict[str, object]:
         "realVideos": sorted_video_paths(demo_root / "real_video", website_root),
         "dreamVideos": sorted_video_paths(demo_root / "dream_video", website_root),
         "thirdVideos": sorted_video_paths(demo_root / "third_video", website_root),
+        "longVideos": sorted_video_paths(demo_root / "long_video", website_root),
+        "memoryVideos": sorted_video_paths(demo_root / "memory_video", website_root),
         "singleEventScenes": sorted_scene_entries(demo_root / "event_video" / "single", website_root),
         "multipleEventScenes": sorted_scene_entries(demo_root / "event_video" / "multiple", website_root),
     }
