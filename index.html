@@ -644,6 +644,9 @@ This capability also provides a strong foundation for agents learning from exper
 
   <script>
     const VIDEO_EXTENSIONS = [".mp4", ".webm", ".mov", ".m4v", ".ogg"];
+    const EXCLUDED_VIDEO_PATHS = new Set([
+      "assets/demo_videos/long_video/long_02.mp4",
+    ]);
     const EVENT_OVERLAY_MIN_MS = 1500;
 
     function isVideoName(name) {
@@ -670,6 +673,14 @@ This capability also provides a strong foundation for agents learning from exper
       return [...urls].sort((a, b) =>
         fileNameOf(a).localeCompare(fileNameOf(b), undefined, { numeric: true, sensitivity: "base" })
       );
+    }
+
+    function normalizedAssetPath(url) {
+      return decodeURIComponent(url).replace(/^\.\//, "");
+    }
+
+    function isExcludedVideo(url) {
+      return EXCLUDED_VIDEO_PATHS.has(normalizedAssetPath(url));
     }
 
     function sceneLabel(name) {
@@ -712,7 +723,8 @@ This capability also provides a strong foundation for agents learning from exper
           .map(h => decodeURIComponent(h.split("#")[0].split("?")[0]))
           .filter(h => !h.endsWith("/"))
           .filter(isVideoName)
-          .map(h => `${path}/${h.replace(/^\.?\//, "")}`);
+          .map(h => `${path}/${h.replace(/^\.?\//, "")}`)
+          .filter((url) => !isExcludedVideo(url));
         const uniqueListed = [...new Set(listed)];
         if (uniqueListed.length > 0) {
           return sortVideoUrls(uniqueListed);
@@ -752,7 +764,7 @@ This capability also provides a strong foundation for agents learning from exper
 
     function normalizeVideoList(list) {
       if (!Array.isArray(list)) return [];
-      return sortVideoUrls(list.filter((v) => typeof v === "string" && isVideoName(v)));
+      return sortVideoUrls(list.filter((v) => typeof v === "string" && isVideoName(v) && !isExcludedVideo(v)));
     }
 
     function normalizeSceneList(scenes) {

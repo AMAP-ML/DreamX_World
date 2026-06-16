@@ -8,6 +8,9 @@ from typing import Dict, List
 
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".m4v", ".ogg"}
+EXCLUDED_VIDEO_PATHS = {
+    "assets/demo_videos/long_video/long_02.mp4",
+}
 
 
 def natural_key(value: str):
@@ -25,7 +28,10 @@ def sorted_video_paths(directory: Path, root: Path) -> List[str]:
         and path.suffix.lower() in VIDEO_EXTENSIONS
     ]
     videos.sort(key=lambda p: natural_key(p.name))
-    return [p.relative_to(root).as_posix() for p in videos]
+    return [
+        path for path in (p.relative_to(root).as_posix() for p in videos)
+        if path not in EXCLUDED_VIDEO_PATHS
+    ]
 
 
 def sorted_scene_entries(scene_root: Path, root: Path) -> List[Dict[str, object]]:
